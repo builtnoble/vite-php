@@ -1,12 +1,8 @@
 # Contributing Guide
 
----
-
 Thank you for taking the time to contribute! 🎉
 
 This project welcomes pull requests, bug reports, and feature ideas to help improve the package for the PHP community.
-
----
 
 ## Code Style
 
