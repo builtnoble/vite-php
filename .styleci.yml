@@ -46,7 +46,7 @@ enabled:
   - no_empty_comment
   - no_empty_phpdoc
   - no_empty_statement
-  - no_extra_blank_lines
+  - no_extra_consecutive_blank_lines
   - no_multiline_whitespace_around_double_arrow
   - no_multiline_whitespace_after_semicolon
   - no_short_bool_cast
@@ -54,6 +54,8 @@ enabled:
   - no_single_line_asterisk_comment
   - no_spaces_inside_offset
   - no_spaces_outside_offset
+  - no_superfluous_elseif
+  - no_superfluous_phpdoc_tags_strict
   - no_trailing_comma_in_singleline_arguments
   - no_trailing_comma_in_singleline_array
   - no_trailing_comma_in_singleline_array_destructuring
