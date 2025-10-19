@@ -9,6 +9,7 @@
 /.idea
 /.nova
 /.php-cs-fixer.cache
+/.php-cs-fixer.php
 /.phpunit.cache
 /.vscode
 /.zed
