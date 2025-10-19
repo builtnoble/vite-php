@@ -74,7 +74,7 @@ enabled:
   - no_whitespace_before_comma_in_array
   - normalize_index_brace
   - normalize_nullable_type_declaration
-  - nullable_type_declaration
+  - nullable_type_declarations
   - object_operator_without_whitespace
   - phpdoc_annotation_without_dot
   - phpdoc_indent
