@@ -2,8 +2,10 @@ version: 8.4
 risky: false
 finder:
   exclude:
-    - vendor
-    - tests/temp
+    - "vendor"
+    - "tests/temp"
+  name:
+    - "*.php"
 preset: psr12
 enabled:
   - align_comments
