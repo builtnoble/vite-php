@@ -37,33 +37,7 @@ the [static analysis section](#static-analysis) below for guidance on using cust
 ### Local Formatting
 
 If you'd prefer to format your code locally, before submitting a pull request, you can
-use [PHP CS Fixer](https://cs.symfony.com/) with the following rules:
-
-```php
-[
-    '@PSR12' => true,
-    '@PhpCsFixer' => true,
-    'assign_null_coalescing_to_coalesce_equal' => true,
-    'concat_space' => ['spacing' => 'one'],
-    'group_import' => true,
-    'heredoc_indentation' => true,
-    'increment_style' => ['style' => 'post'],
-    'multiline_promoted_properties' => true,
-    'multiline_whitespace_before_semicolons' => ['strategy' => 'no_multi_line'],
-    'new_expression_parentheses' => true,
-    'not_operator_with_successor_space' => true,
-    'octal_notation' => true,
-    'ordered_attributes' => true,
-    'ordered_interfaces' => true,
-    'phpdoc_align' => ['align' => 'left'],
-    'phpdoc_to_comment' => ['allow_before_return_statement' => true, 'ignored_tags' => ['todo']],
-    'simplified_if_return' => true,
-    'simplified_null_return' => true,
-    'single_import_per_statement' => false,
-    'ternary_to_null_coalescing' => true,
-    'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
-]
-```
+use [PHP CS Fixer](https://cs.symfony.com/) with the provided `.php-cs-fixer.dist.php` configuration file.
 
 ---
 
@@ -82,11 +56,11 @@ All tests are located in the `tests/` directory. Tests can be run a variety of w
 convenience, most commonly used commands (and their args) have been added to the project's `composer.json`:
 
 ```bash
-composer test               # Run the test suite
-composer test:dirty         # Run only tests affected by recent changes
-composer test:coverage      # Run tests with code coverage report
-composer test:mutate        # Run mutation testing
-composer test:type-coverage # Run type coverage analysis
+composer test               # Run the test suite with Pest.
+composer test:coverage      # Run the test suite and generate a code coverage report, requiring at least 89% coverage.
+composer test:dirty         # Run only the tests affected by recent changes.
+composer test:mutate        # Run mutation testing to evaluate test effectiveness.
+composer test:type-coverage # Check the type coverage of the codebase, requiring at least 80% coverage.
 ```
 
 ---
@@ -111,7 +85,8 @@ type, similar to what can be done in languages like TypeScript, might be a bette
 ### Custom Type Example
 
 > [!NOTE] Be sure to read
-> the [PHPStan documentation on custom types](https://phpstan.org/developing-extensions/custom-phpdoc-types) before going
+> the [PHPStan documentation on custom types](https://phpstan.org/developing-extensions/custom-phpdoc-types) before
+> going
 > down this route
 
 Without a custom type, we'd be copy-pasting this block everywhere it's needed:
