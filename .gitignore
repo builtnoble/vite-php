@@ -20,7 +20,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
-/tests/temp/
+/tests/tmp/
 /vendor
 Homestead.json
 Homestead.yaml
