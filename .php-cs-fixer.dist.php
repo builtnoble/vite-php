@@ -23,7 +23,6 @@ return $config->setRules([
     'octal_notation' => true,
     'ordered_attributes' => true,
     'ordered_interfaces' => true,
-    'phpdoc_align' => ['align' => 'left'],
     'phpdoc_to_comment' => ['allow_before_return_statement' => true, 'ignored_tags' => ['todo']],
     'simplified_if_return' => true,
     'simplified_null_return' => true,
