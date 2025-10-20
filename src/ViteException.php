@@ -6,4 +6,6 @@ namespace Builtnoble\VitePHP;
 
 use Exception;
 
-class ViteException extends Exception {}
+class ViteException extends Exception
+{
+}
