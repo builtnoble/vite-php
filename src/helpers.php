@@ -8,9 +8,9 @@ if (! function_exists('partition')) {
     /**
      * Partitions an array into two arrays based on a callback function.
      *
-     * @param  array  $array  the array to partition
-     * @param  callable  $callback  The callback function to determine the partitioning.
-     *                              It should return true or false.
+     * @param array $array the array to partition
+     * @param callable $callback The callback function to determine the partitioning.
+     *                           It should return true or false.
      *
      * @return array an array containing two arrays: the first with elements
      *               for which the callback returned true, and the second with

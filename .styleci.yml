@@ -36,7 +36,6 @@ enabled:
   - heredoc_to_nowdoc
   - include
   - integer_literal_case
-  - laravel_phpdoc_alignment
   - linebreak_after_opening_tag
   - magic_constant_casing
   - magic_method_casing
@@ -84,6 +83,7 @@ enabled:
   - object_operator_without_whitespace
   - php_unit_fqcn_annotation
   - php_unit_test_class_requires_covers
+  - phpdoc_align
   - phpdoc_annotation_without_dot
   - phpdoc_indent
   - phpdoc_inline_tag_normalizer
