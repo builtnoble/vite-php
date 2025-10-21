@@ -43,12 +43,26 @@ function makeInvalidManifest(): void
 /**
  * Initialize a Vite instance for testing.
  */
-function initializeVite(?string $buildDir = null, ?string $publicDir = null): Vite
+function initializeVite(?string $buildDir = null, ?string $publicDir = null, ?bool $mock = false): Vite
 {
     test()->buildDir = $buildDir ?? 'tmp';
     test()->publicDir = $publicDir ?? 'tmp';
 
-    test()->vite = new Vite();
+    if ($mock === true) {
+        test()->vite = Mockery::mock(Vite::class);
+
+        test()->vite->shouldReceive('setBuildDir')
+            ->once()
+            ->with($buildDir)
+            ->andReturnSelf();
+
+        test()->vite->shouldReceive('setPublicDir')
+            ->once()
+            ->with($publicDir)
+            ->andReturnSelf();
+    } else {
+        test()->vite = new Vite();
+    }
 
     test()->vite->setBuildDir(test()->buildDir);
     test()->vite->setPublicDir(test()->publicDir);
