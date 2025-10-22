@@ -24,6 +24,7 @@ return $config->setRules([
     'ordered_attributes' => true,
     'ordered_interfaces' => true,
     'phpdoc_to_comment' => ['allow_before_return_statement' => true, 'ignored_tags' => ['todo']],
+    'phpdoc_types_order' => ['null_adjustment' => 'always_last'],
     'simplified_if_return' => true,
     'simplified_null_return' => true,
     'single_import_per_statement' => false,
