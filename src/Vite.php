@@ -51,7 +51,7 @@ final class Vite implements ViteInterface
      */
     private array $styleTagAttributesResolvers = [];
 
-    /** @var null|callable(string, array): string */
+    /** @var callable(string, array): string|null */
     private $assetPathResolver;
 
     /**
