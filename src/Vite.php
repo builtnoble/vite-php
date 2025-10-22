@@ -6,53 +6,53 @@ namespace Builtnoble\VitePHP;
 
 use Random\RandomException;
 
-class Vite
+final class Vite implements ViteInterface
 {
     /**
      * Nonce value for Content Security Policy (CSP).
      */
-    protected ?string $nonce = null;
+    private ?string $nonce = null;
 
     /**
      * The name of the hot module replacement (HMR) file.
      */
-    protected string $hotfile;
+    private string $hotfile;
 
     /**
      * The directory where the build assets are located.
      */
-    protected string $buildDir = 'build';
+    private string $buildDir = 'build';
 
     /**
      * The directory where the index.php or static assets are located.
      */
-    protected string $publicDir = 'public';
+    private string $publicDir = 'public';
 
     /**
      * The filename of the Vite manifest file.
      */
-    protected string $manifestFilename = 'manifest.json';
+    private string $manifestFilename = 'manifest.json';
 
     /**
      * The key in the manifest file that contains the integrity hash. Set as
      * false to disable integrity checks.
      */
-    protected false|string $integrityKey = 'integrity';
+    private false|string $integrityKey = 'integrity';
 
     /**
      * List of additional attributes to add to the script tags when generating
      * script tags for assets.
      */
-    protected array $scriptTagAttributesResolvers = [];
+    private array $scriptTagAttributesResolvers = [];
 
     /**
      * List of additional attributes to add to the style tags when generating
      * style tags for assets.
      */
-    protected array $styleTagAttributesResolvers = [];
+    private array $styleTagAttributesResolvers = [];
 
-    /** @var callable(string, array): string|null */
-    protected $assetPathResolver;
+    /** @var null|callable(string, array): string */
+    private $assetPathResolver;
 
     /**
      * Traverse the vite manifest and generate HTML tags for the given entries.
@@ -175,28 +175,28 @@ class Vite
         $this->nonce = $nonce ?? randomStr(40);
     }
 
-    public function setBuildDir(string $path): Vite
+    public function setBuildDir(string $path): self
     {
         $this->buildDir = $path;
 
         return $this;
     }
 
-    public function setPublicDir(string $publicDir): Vite
+    public function setPublicDir(string $publicDir): self
     {
         $this->publicDir = $publicDir;
 
         return $this;
     }
 
-    public function setManifestFilename(string $manifestFilename): Vite
+    public function setManifestFilename(string $manifestFilename): self
     {
         $this->manifestFilename = $manifestFilename;
 
         return $this;
     }
 
-    public function setIntegrityKey(false|string $key): Vite
+    public function setIntegrityKey(false|string $key): self
     {
         $this->integrityKey = $key;
 
@@ -206,7 +206,7 @@ class Vite
     /**
      * Set a callback to resolve attributes for script tags.
      */
-    public function setScriptTagAttributesResolvers(array|callable $attrs): Vite
+    public function setScriptTagAttributesResolvers(array|callable $attrs): self
     {
         if (! is_callable($attrs)) {
             $attrs = fn () => $attrs;
@@ -220,7 +220,7 @@ class Vite
     /**
      * Set a callback to resolve attributes for style tags.
      */
-    public function setStyleTagAttributesResolvers(array|callable $attrs): Vite
+    public function setStyleTagAttributesResolvers(array|callable $attrs): self
     {
         if (! is_callable($attrs)) {
             $attrs = fn () => $attrs;
@@ -236,7 +236,7 @@ class Vite
      *
      * @throws ViteException
      */
-    protected function manifestContents(?string $buildDir = null): array
+    private function manifestContents(?string $buildDir = null): array
     {
         $buildDir ??= $this->buildDir;
 
@@ -258,11 +258,11 @@ class Vite
     /**
      * Get the path to the Vite manifest file.
      */
-    protected function manifestPath(?string $buildDir = null): string
+    private function manifestPath(?string $buildDir = null): string
     {
         $buildDir ??= $this->buildDir;
 
-        return "{$buildDir}/.vite/{$this->manifestFilename}";
+        return "{$this->publicDir}/{$buildDir}/.vite/{$this->manifestFilename}";
     }
 
     /**
@@ -270,7 +270,7 @@ class Vite
      *
      * @throws ViteException
      */
-    protected function chunk(array $manifest, string $entry): array
+    private function chunk(array $manifest, string $entry): array
     {
         if (! isset($manifest[$entry])) {
             throw new ViteException("Unable to find entry in Vite manifest: {$entry}");
@@ -282,7 +282,7 @@ class Vite
     /**
      * Generate a script or link tag for an entry chunk.
      */
-    protected function makeTagForChunk(string $src, string $url, ?array $chunk = null, ?array $manifest = null): string
+    private function makeTagForChunk(string $src, string $url, ?array $chunk = null, ?array $manifest = null): string
     {
         if (
             $this->nonce === null
@@ -311,7 +311,7 @@ class Vite
     /**
      * Check if the file at the given path is some form of CSS file.
      */
-    protected function isCssFile(string $path): bool
+    private function isCssFile(string $path): bool
     {
         return preg_match('/\.(css|less|sass|scss|styl|stylus|pcss|postcss)(\?[^.]*)?$/', $path) === 1;
     }
@@ -319,7 +319,7 @@ class Vite
     /**
      * Generate a link tag with attributes for the given URL.
      */
-    protected function makeStylesheetTagWithAttributes(string $url, array $attributes): string
+    private function makeStylesheetTagWithAttributes(string $url, array $attributes): string
     {
         $attributes = $this->parseAttributes(array_merge([
             'rel' => 'stylesheet',
@@ -333,7 +333,7 @@ class Vite
     /**
      * Parse the attributes into key="value" strings.
      */
-    protected function parseAttributes(array $attributes): array
+    private function parseAttributes(array $attributes): array
     {
         $result = [];
 
@@ -354,7 +354,7 @@ class Vite
     /**
      * Generate a script tag with attributes for the given URL.
      */
-    protected function makeScriptTagWithAttributes(string $url, array $attributes): string
+    private function makeScriptTagWithAttributes(string $url, array $attributes): string
     {
         $attributes = $this->parseAttributes(array_merge([
             'type' => 'module',
@@ -368,7 +368,7 @@ class Vite
     /**
      * Resolve the attributes for the chunks generated stylesheet tag.
      */
-    protected function resolveStylesheetTagAttributes(
+    private function resolveStylesheetTagAttributes(
         string $src,
         string $url,
         ?array $chunk = null,
@@ -388,7 +388,7 @@ class Vite
     /**
      * Resolve the attributes for the chunks generated script tag.
      */
-    protected function resolveScriptTagAttributes(
+    private function resolveScriptTagAttributes(
         string $src,
         string $url,
         ?array $chunk = null,
@@ -408,7 +408,7 @@ class Vite
     /**
      * Resolve the asset path using the configured resolver or fallback.
      */
-    protected function assetPath(string $path, array $context = []): string
+    private function assetPath(string $path, array $context = []): string
     {
         return $this->assetPathResolver !== null
             ? ($this->assetPathResolver)($path, $context)
@@ -418,7 +418,7 @@ class Vite
     /**
      * Get the path to an asset when the HMR server is running.
      */
-    protected function hotAsset(string $path): string
+    private function hotAsset(string $path): string
     {
         return rtrim(file_get_contents($this->getHotfile())) . '/' . $path;
     }

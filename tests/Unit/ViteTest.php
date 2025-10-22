@@ -37,19 +37,25 @@ beforeAll(function () {
     makeInvalidManifest();
 });
 
-beforeEach()->initializeVite(
-    buildDir: dirname(__DIR__) . '/tmp',
-    publicDir: dirname(__DIR__) . '/tmp/public'
-);
+beforeEach()->initializeVite();
 
 describe('Exception handling', function () {
     it('throws exception if the manifest file is missing', function () {
         $this->vite->setBuildDir('non/existent/path');
-        ($this->vite)(['app.js', 'app.css']);
-    })->throws(
-        ViteException::class,
-        'Vite manifest not found at path: non/existent/path/.vite/manifest.json'
-    );
+        expect(fn () => ($this->vite)(['app.js', 'app.css']))->toThrow(
+            ViteException::class,
+            "Vite manifest not found at path: {$this->publicDir}/non/existent/path/.vite/manifest.json"
+        );
+    });
+
+    it('throws exception if manifest is not valid JSON', function () {
+        $this->vite->setManifestFilename('invalid_manifest.json');
+
+        expect(fn () => ($this->vite)(['app.js', 'app.css']))->toThrow(
+            ViteException::class,
+            "Invalid JSON in Vite manifest file at: {$this->publicDir}/build/.vite/invalid_manifest.json"
+        );
+    });
 
     it('throws exception if entry is missing in manifest', function () {
         ($this->vite)(['missing_entry.js']);
@@ -57,15 +63,6 @@ describe('Exception handling', function () {
         ViteException::class,
         'Unable to find entry in Vite manifest: missing_entry.js'
     );
-
-    it('throws exception if manifest is not valid JSON', function () {
-        $this->vite->setManifestFilename('invalid_manifest.json');
-
-        expect(fn () => ($this->vite)(['app.js', 'app.css']))->toThrow(
-            ViteException::class,
-            "Invalid JSON in Vite manifest file at: {$this->buildDir}/.vite/invalid_manifest.json"
-        );
-    });
 });
 
 describe('Asset path resolving', function () {
@@ -237,11 +234,12 @@ describe('Tag attributes', function () {
             );
     });
 
-    it('adds nonce attribute if nonce is set w/o a string', function () {
+    it('generates 40 character random string when calling setNonce w/o argument', function () {
         $this->vite->setNonce();
         $nonce = $this->vite->getNonce();
 
         expect($this->vite->getNonce())->toBeString()
+            ->and(strlen($nonce))->toBe(40)
             ->and(($this->vite)(['app.js', 'app.css']))->toBe(
                 implode(PHP_EOL, [
                     "<link rel=\"stylesheet\" href=\"{$this->buildDir}/assets/app.def456.css\" nonce=\"{$nonce}\" />",

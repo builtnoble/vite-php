@@ -7,12 +7,13 @@ use Builtnoble\VitePHP\Vite;
 /**
  * Create a manifest file with the given entries.
  */
-function makeManifest(array $entries): void
+function makeManifest(array $entries, ?string $publicDir = '/tmp', ?string $buildDir = null): void
 {
-    $path = __DIR__ . '/tmp/.vite/manifest.json';
+    $buildDir ??= 'build';
+    $path = __DIR__ . $publicDir . "/{$buildDir}/.vite/manifest.json";
 
     if (! is_dir($path)) {
-        @mkdir(__DIR__ . '/tmp/.vite', 0o755, true);
+        @mkdir(__DIR__ . $publicDir . "/{$buildDir}/.vite", 0o755, true);
     }
 
     if (file_exists($path)) {
@@ -25,12 +26,12 @@ function makeManifest(array $entries): void
 /**
  * Create an invalid manifest file.
  */
-function makeInvalidManifest(): void
+function makeInvalidManifest(?string $publicDir = '/tmp'): void
 {
-    $path = __DIR__ . '/tmp/.vite/invalid_manifest.json';
+    $path = __DIR__ . $publicDir . '/build/.vite/invalid_manifest.json';
 
     if (! is_dir($path)) {
-        @mkdir(__DIR__ . '/tmp/.vite', 0o755, true);
+        @mkdir(__DIR__ . $publicDir . '/build/.vite', 0o755, true);
     }
 
     if (file_exists($path)) {
@@ -43,28 +44,12 @@ function makeInvalidManifest(): void
 /**
  * Initialize a Vite instance for testing.
  */
-function initializeVite(?string $buildDir = null, ?string $publicDir = null, ?bool $mock = false): Vite
+function initializeVite(?string $publicDir = null): Vite
 {
-    test()->buildDir = $buildDir ?? 'tmp';
-    test()->publicDir = $publicDir ?? 'tmp';
+    test()->publicDir = $publicDir ?? __DIR__ . '/tmp';
+    test()->buildDir = 'build';
 
-    if ($mock === true) {
-        test()->vite = Mockery::mock(Vite::class);
-
-        test()->vite->shouldReceive('setBuildDir')
-            ->once()
-            ->with($buildDir)
-            ->andReturnSelf();
-
-        test()->vite->shouldReceive('setPublicDir')
-            ->once()
-            ->with($publicDir)
-            ->andReturnSelf();
-    } else {
-        test()->vite = new Vite();
-    }
-
-    test()->vite->setBuildDir(test()->buildDir);
+    test()->vite = new Vite();
     test()->vite->setPublicDir(test()->publicDir);
 
     return test()->vite;

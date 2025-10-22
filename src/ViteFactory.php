@@ -25,12 +25,12 @@ final class ViteFactory
      * @throws RandomException if nonce generation is requested and fails
      * @throws ViteException
      */
-    public static function make(array $options = [], ?callable $creator = null): Vite
+    public static function make(array $options = [], ?callable $creator = null): ViteInterface
     {
         $vite = $creator ? $creator() : new Vite();
 
-        if (! $vite instanceof Vite) {
-            throw new ViteException('The creator callable must return an instance of ' . Vite::class);
+        if (! $vite instanceof ViteInterface) {
+            throw new ViteException('The creator callable must return an instance of ' . ViteInterface::class);
         }
 
         if (array_key_exists('assetPathResolver', $options)) {
@@ -89,11 +89,17 @@ final class ViteFactory
         }
 
         if (! is_array($value)) {
-            // @codeCoverageIgnoreStart
-            return [$value];
-            // @codeCoverageIgnoreEnd
+            throw new ViteException('Resolver option must be a callable or an array of callables/attribute arrays.');
         }
 
-        return array_values($value);
+        $values = array_values($value);
+
+        foreach ($values as $v) {
+            if (! is_callable($v) && ! is_array($v)) {
+                throw new ViteException('Each resolver array value must be a callable or an attribute array.');
+            }
+        }
+
+        return $values;
     }
 }
