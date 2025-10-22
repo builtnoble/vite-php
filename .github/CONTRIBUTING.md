@@ -59,7 +59,7 @@ convenience, most commonly used commands (and their args) have been added to the
 composer test               # Run the test suite with Pest.
 composer test:coverage      # Run the test suite and generate a code coverage report, requiring at least 89% coverage.
 composer test:dirty         # Run only the tests affected by recent changes.
-composer test:mutate        # Run mutation testing to evaluate test effectiveness.
+composer test:mutate        # Run mutation testing to evaluate test effectiveness, requiring at least 70% coverage.
 composer test:type-coverage # Check the type coverage of the codebase, requiring at least 80% coverage.
 ```
 
