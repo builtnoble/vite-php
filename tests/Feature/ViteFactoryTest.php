@@ -49,7 +49,7 @@ describe('Vite Factory', function () {
         $this->viteMock->shouldReceive('getNonce')->andReturnNull();
         $this->viteMock->shouldReceive('isRunningHot')->andReturnFalse();
 
-        // Simulate asset method throwing exception to confirm publicDir/buildDir/manifestFilename defaults
+        // Simulate asset method throwing exception to confirm publicPath/buildDir/manifestFilename defaults
         $this->viteMock->shouldReceive('asset')->withAnyArgs()->andThrowExceptions([
             new ViteException('Vite manifest not found at path: public/build/.vite/manifest.json'),
         ]);
@@ -70,11 +70,11 @@ describe('Vite Factory', function () {
         $options = [
             'hotfile' => 123,
             'buildDir' => 456,
-            'publicDir' => 789,
+            'publicPath' => 789,
             'manifestFilename' => 101112,
         ];
 
-        $message = "Vite manifest not found at path: {$options['publicDir']}/{$options['buildDir']}/.vite/{$options['manifestFilename']}";
+        $message = "Vite manifest not found at path: {$options['publicPath']}/{$options['buildDir']}/.vite/{$options['manifestFilename']}";
 
         $this->viteMock->shouldReceive('setHotfile')
             ->with('123')

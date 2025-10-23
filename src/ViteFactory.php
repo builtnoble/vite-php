@@ -18,7 +18,7 @@ final class ViteFactory
      *  - nonce: string|null (pass null to generate a random nonce)
      *  - hotfile: string
      *  - buildDir: string
-     *  - publicDir: string
+     *  - publicPath: string
      *  - manifestFilename: string
      *  - integrityKey: string|false
      *
@@ -45,8 +45,8 @@ final class ViteFactory
             $vite->setBuildDir((string) $options['buildDir']);
         }
 
-        if (array_key_exists('publicDir', $options)) {
-            $vite->setPublicPath((string) $options['publicDir']);
+        if (array_key_exists('publicPath', $options)) {
+            $vite->setPublicPath((string) $options['publicPath']);
         }
 
         if (array_key_exists('manifestFilename', $options)) {

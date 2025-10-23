@@ -44,7 +44,7 @@ describe('Exception handling', function () {
         $this->vite->setBuildDir('non/existent/path');
         expect(fn () => ($this->vite)(['app.js', 'app.css']))->toThrow(
             ViteException::class,
-            "Vite manifest not found at path: {$this->publicDir}/non/existent/path/.vite/manifest.json"
+            "Vite manifest not found at path: {$this->publicPath}/non/existent/path/.vite/manifest.json"
         );
     });
 
@@ -53,7 +53,7 @@ describe('Exception handling', function () {
 
         expect(fn () => ($this->vite)(['app.js', 'app.css']))->toThrow(
             ViteException::class,
-            "Invalid JSON in Vite manifest file at: {$this->publicDir}/build/.vite/invalid_manifest.json"
+            "Invalid JSON in Vite manifest file at: {$this->publicPath}/build/.vite/invalid_manifest.json"
         );
     });
 
@@ -98,12 +98,12 @@ describe('Asset path resolving', function () {
     });
 
     it('returns original path if HMR is enabled', function () {
-        if (! is_dir($this->publicDir)) {
-            @mkdir($this->publicDir, 0o755, true);
+        if (! is_dir($this->publicPath)) {
+            @mkdir($this->publicPath, 0o755, true);
         }
 
-        if (! file_exists("{$this->publicDir}/hot")) {
-            @file_put_contents("{$this->publicDir}/hot", '');
+        if (! file_exists("{$this->publicPath}/hot")) {
+            @file_put_contents("{$this->publicPath}/hot", '');
         }
 
         expect($this->vite->asset('app.js'))->toBe('/app.js');
@@ -293,12 +293,12 @@ describe('Tag attributes', function () {
 
 describe('HMR (Hot Module Replacement)', function () {
     beforeEach(function () {
-        if (! is_dir($this->publicDir)) {
-            @mkdir($this->publicDir, 0o755, true);
+        if (! is_dir($this->publicPath)) {
+            @mkdir($this->publicPath, 0o755, true);
         }
 
-        if (! file_exists("{$this->publicDir}/hot")) {
-            @file_put_contents("{$this->publicDir}/hot", '');
+        if (! file_exists("{$this->publicPath}/hot")) {
+            @file_put_contents("{$this->publicPath}/hot", '');
         }
     });
 
@@ -315,11 +315,11 @@ describe('HMR (Hot Module Replacement)', function () {
     });
 
     it('returns default hotfile path when no custom path is set', function () {
-        expect($this->vite->getHotfile())->toBe("{$this->publicDir}/hot");
+        expect($this->vite->getHotfile())->toBe("{$this->publicPath}/hot");
     });
 
     it('checks if HMR server is running when hotfile exists', function () {
-        expect($this->vite->getHotfile())->toBe("{$this->publicDir}/hot")
+        expect($this->vite->getHotfile())->toBe("{$this->publicPath}/hot")
             ->and($this->vite->isRunningHot())->toBeTrue();
     });
 

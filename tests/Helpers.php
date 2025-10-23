@@ -7,13 +7,13 @@ use Builtnoble\VitePHP\Vite;
 /**
  * Create a manifest file with the given entries.
  */
-function makeManifest(array $entries, ?string $publicDir = '/tmp', ?string $buildDir = null): void
+function makeManifest(array $entries, ?string $publicPath = '/tmp', ?string $buildDir = null): void
 {
     $buildDir ??= 'build';
-    $path = __DIR__ . $publicDir . "/{$buildDir}/.vite/manifest.json";
+    $path = __DIR__ . $publicPath . "/{$buildDir}/.vite/manifest.json";
 
     if (! is_dir($path)) {
-        @mkdir(__DIR__ . $publicDir . "/{$buildDir}/.vite", 0o755, true);
+        @mkdir(__DIR__ . $publicPath . "/{$buildDir}/.vite", 0o755, true);
     }
 
     if (file_exists($path)) {
@@ -26,12 +26,12 @@ function makeManifest(array $entries, ?string $publicDir = '/tmp', ?string $buil
 /**
  * Create an invalid manifest file.
  */
-function makeInvalidManifest(?string $publicDir = '/tmp'): void
+function makeInvalidManifest(?string $publicPath = '/tmp'): void
 {
-    $path = __DIR__ . $publicDir . '/build/.vite/invalid_manifest.json';
+    $path = __DIR__ . $publicPath . '/build/.vite/invalid_manifest.json';
 
     if (! is_dir($path)) {
-        @mkdir(__DIR__ . $publicDir . '/build/.vite', 0o755, true);
+        @mkdir(__DIR__ . $publicPath . '/build/.vite', 0o755, true);
     }
 
     if (file_exists($path)) {
@@ -44,13 +44,13 @@ function makeInvalidManifest(?string $publicDir = '/tmp'): void
 /**
  * Initialize a Vite instance for testing.
  */
-function initializeVite(?string $publicDir = null): Vite
+function initializeVite(?string $publicPath = null): Vite
 {
-    test()->publicDir = $publicDir ?? __DIR__ . '/tmp';
+    test()->publicPath = $publicPath ?? __DIR__ . '/tmp';
     test()->buildDir = 'build';
 
     test()->vite = new Vite();
-    test()->vite->setPublicPath(test()->publicDir);
+    test()->vite->setPublicPath(test()->publicPath);
 
     return test()->vite;
 }

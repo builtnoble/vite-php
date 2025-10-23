@@ -40,7 +40,7 @@ try {
     $vite = ViteFactory::make([
         'hotfile' => '/tmp/vite-dev-server',
         'buildDir' => 'dist',
-        'publicDir' => 'public',
+        'publicPath' => 'public',
         'manifestFilename' => 'manifest.json',
         'integrityKey' => 'my_integrity_key',
         'nonce' => null, // pass null to generate a random nonce
