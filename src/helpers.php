@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Builtnoble\VitePHP\ViteException;
 use Random\RandomException;
 
 if (! function_exists('partition')) {
@@ -50,5 +51,35 @@ if (! function_exists('randomStr')) {
         }
 
         return $string;
+    }
+}
+
+if (! function_exists('normalizeResolvers')) {
+    /**
+     * Normalize a resolver option into an array of resolvers.
+     *
+     * Accepts a single callable, an array of callables, or an array of attribute arrays.
+     *
+     * @throws ViteException
+     */
+    function normalizeResolvers(mixed $value): array
+    {
+        if (is_callable($value)) {
+            return [$value];
+        }
+
+        if (! is_array($value)) {
+            throw new ViteException('Resolver option must be a callable or an array of callables/attribute arrays.');
+        }
+
+        $values = array_values($value);
+
+        foreach ($values as $v) {
+            if (! is_callable($v) && ! is_array($v)) {
+                throw new ViteException('Each resolver array value must be a callable or an attribute array.');
+            }
+        }
+
+        return $values;
     }
 }
