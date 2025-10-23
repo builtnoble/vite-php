@@ -86,7 +86,7 @@ describe('Vite Factory', function () {
             ->once()
             ->andReturnSelf();
 
-        $this->viteMock->shouldReceive('setPublicDir')
+        $this->viteMock->shouldReceive('setPublicPath')
             ->with('789')
             ->once()
             ->andReturnSelf();

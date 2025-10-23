@@ -50,7 +50,7 @@ function initializeVite(?string $publicDir = null): Vite
     test()->buildDir = 'build';
 
     test()->vite = new Vite();
-    test()->vite->setPublicDir(test()->publicDir);
+    test()->vite->setPublicPath(test()->publicDir);
 
     return test()->vite;
 }

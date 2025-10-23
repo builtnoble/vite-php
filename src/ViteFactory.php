@@ -46,7 +46,7 @@ final class ViteFactory
         }
 
         if (array_key_exists('publicDir', $options)) {
-            $vite->setPublicDir((string) $options['publicDir']);
+            $vite->setPublicPath((string) $options['publicDir']);
         }
 
         if (array_key_exists('manifestFilename', $options)) {

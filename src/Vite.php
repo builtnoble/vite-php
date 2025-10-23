@@ -19,14 +19,15 @@ final class Vite implements ViteInterface
     private string $hotfile;
 
     /**
-     * The directory where the build assets are located.
+     * The name of directory where Vite will store its manifest file and any
+     * compiled assets.
      */
     private string $buildDir = 'build';
 
     /**
-     * The directory where the index.php or static assets are located.
+     * The path to where public files, like static assets, are located.
      */
-    private string $publicDir = 'public';
+    private string $publicPath = 'public';
 
     /**
      * The filename of the Vite manifest file.
@@ -40,24 +41,29 @@ final class Vite implements ViteInterface
     private false|string $integrityKey = 'integrity';
 
     /**
-     * List of additional attributes to add to the script tags when generating
-     * script tags for assets.
+     * Additional attributes to add to the script tags when generating.
      */
     private array $scriptTagAttributesResolvers = [];
 
     /**
-     * List of additional attributes to add to the style tags when generating
-     * style tags for assets.
+     * Additional attributes to add to the style tags when generating.
      */
     private array $styleTagAttributesResolvers = [];
 
-    /** @var callable(string, array): string|null */
+    /**
+     *  Custom resolver for returning asset paths.
+     *
+     * @var callable(string, array): string|null
+     */
     private $assetPathResolver;
 
     /**
-     * Traverse the vite manifest and generate HTML tags for the given entries.
+     * Traverse the given entries and return as HTML script and link tags.
      *
-     * @throws ViteException
+     * @throws ViteException if manifest or entry cannot be found or manifest has
+     *                       invalid json
+     *
+     * @todo Add support for @vite/client script tag when running HMR and passing of a string as a single entry.
      */
     public function __invoke(array $entries, ?string $buildDir = null): string
     {
@@ -115,7 +121,9 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Resolve asset paths using the given callable.
+     * Set a custom resolver for returning asset paths. For example, Twig has an
+     * asset() function that can be used to return the correct (public) path for
+     * a given asset.
      */
     public function setAssetPathResolver(?callable $resolver): self
     {
@@ -125,9 +133,9 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Get the path to a Vite asset.
+     * Return the public path for a given asset.
      *
-     * @throws ViteException
+     * @throws ViteException if manifest file cannot be found or has invalid json
      */
     public function asset(string $path, ?string $buildDir = null, array $context = []): string
     {
@@ -143,18 +151,24 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Determine if the HMR server is running.
+     * Determine if Vite is running in hot module replacement mode.
      */
     public function isRunningHot(): bool
     {
         return is_file($this->getHotFile());
     }
 
+    /**
+     * Get the path to the hot file.
+     */
     public function getHotfile(): string
     {
-        return $this->hotfile ?? "{$this->publicDir}/hot";
+        return $this->hotfile ?? "{$this->publicPath}/hot";
     }
 
+    /**
+     * Set the path to the hot file.
+     */
     public function setHotfile(string $path): self
     {
         $this->hotfile = $path;
@@ -162,49 +176,71 @@ final class Vite implements ViteInterface
         return $this;
     }
 
+    /**
+     * Get the current nonce value.
+     */
     public function getNonce(): ?string
     {
         return $this->nonce;
     }
 
     /**
-     * @throws RandomException
+     * Set a nonce value to be added to script and link tags. If null, a random
+     * 40-character string will be generated.
+     *
+     * @throws RandomException if random string generation fails
      */
-    public function setNonce(?string $nonce = null): void
+    public function setNonce(?string $value = null): void
     {
-        $this->nonce = $nonce ?? randomStr(40);
+        $this->nonce = $value ?? randomStr(40);
     }
 
-    public function setBuildDir(string $path): self
+    /**
+     * Set the name of the directory where Vite will store its manifest file
+     * and any compiled assets.
+     */
+    public function setBuildDir(string $name): self
     {
-        $this->buildDir = $path;
-
-        return $this;
-    }
-
-    public function setPublicDir(string $publicDir): self
-    {
-        $this->publicDir = $publicDir;
-
-        return $this;
-    }
-
-    public function setManifestFilename(string $manifestFilename): self
-    {
-        $this->manifestFilename = $manifestFilename;
-
-        return $this;
-    }
-
-    public function setIntegrityKey(false|string $key): self
-    {
-        $this->integrityKey = $key;
+        $this->buildDir = $name;
 
         return $this;
     }
 
     /**
-     * Set a callback to resolve attributes for script tags.
+     * Set the path to where public files, like static assets, are located.
+     */
+    public function setPublicPath(string $path): self
+    {
+        $this->publicPath = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the filename of the Vite manifest file.
+     */
+    public function setManifestFilename(string $value): self
+    {
+        $this->manifestFilename = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the key in the manifest file that contains the integrity hash. Set as
+     * false to disable integrity checks.
+     */
+    public function setIntegrityKey(false|string $value): self
+    {
+        $this->integrityKey = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set any additional attributes that should be added to script tags when
+     * they are generated. This can be an associative array of attributes or a
+     * callable that returns such an array.
      */
     public function setScriptTagAttributesResolvers(array|callable $attrs): self
     {
@@ -218,7 +254,9 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Set a callback to resolve attributes for style tags.
+     * Set any additional attributes that should be added to link tags when they
+     * are generated. This can be an associative array of attributes or a callable
+     * that returns such an array.
      */
     public function setStyleTagAttributesResolvers(array|callable $attrs): self
     {
@@ -234,7 +272,7 @@ final class Vite implements ViteInterface
     /**
      * Get the contents of the Vite manifest file.
      *
-     * @throws ViteException
+     * @throws ViteException if manifest cannot be found or has invalid json
      */
     private function manifestContents(?string $buildDir = null): array
     {
@@ -262,13 +300,13 @@ final class Vite implements ViteInterface
     {
         $buildDir ??= $this->buildDir;
 
-        return "{$this->publicDir}/{$buildDir}/.vite/{$this->manifestFilename}";
+        return "{$this->publicPath}/{$buildDir}/.vite/{$this->manifestFilename}";
     }
 
     /**
-     * Get a specific entry from the Vite manifest.
+     * Get a specific entry and its elements from the Vite manifest.
      *
-     * @throws ViteException
+     * @throws ViteException if entry is cannot be found in manifest
      */
     private function chunk(array $manifest, string $entry): array
     {
@@ -319,25 +357,25 @@ final class Vite implements ViteInterface
     /**
      * Generate a link tag with attributes for the given URL.
      */
-    private function makeStylesheetTagWithAttributes(string $url, array $attributes): string
+    private function makeStylesheetTagWithAttributes(string $url, array $attrs): string
     {
-        $attributes = $this->parseAttributes(array_merge([
+        $attrs = $this->parseAttributes(array_merge([
             'rel' => 'stylesheet',
             'href' => $url,
             'nonce' => $this->nonce ?? false,
-        ], $attributes));
+        ], $attrs));
 
-        return '<link ' . implode(' ', $attributes) . ' />' . PHP_EOL;
+        return '<link ' . implode(' ', $attrs) . ' />' . PHP_EOL;
     }
 
     /**
      * Parse the attributes into key="value" strings.
      */
-    private function parseAttributes(array $attributes): array
+    private function parseAttributes(array $attrs): array
     {
         $result = [];
 
-        foreach ($attributes as $key => $value) {
+        foreach ($attrs as $key => $value) {
             if ($value === false || $value === null) {
                 continue;
             }
@@ -354,19 +392,19 @@ final class Vite implements ViteInterface
     /**
      * Generate a script tag with attributes for the given URL.
      */
-    private function makeScriptTagWithAttributes(string $url, array $attributes): string
+    private function makeScriptTagWithAttributes(string $url, array $attrs): string
     {
-        $attributes = $this->parseAttributes(array_merge([
+        $attrs = $this->parseAttributes(array_merge([
             'type' => 'module',
             'src' => $url,
             'nonce' => $this->nonce ?? false,
-        ], $attributes));
+        ], $attrs));
 
-        return '<script ' . implode(' ', $attributes) . '></script>' . PHP_EOL;
+        return '<script ' . implode(' ', $attrs) . '></script>' . PHP_EOL;
     }
 
     /**
-     * Resolve the attributes for the chunks generated stylesheet tag.
+     * Resolve any additional attributes for the chunk's generated link tag.
      */
     private function resolveStylesheetTagAttributes(
         string $src,
@@ -386,7 +424,7 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Resolve the attributes for the chunks generated script tag.
+     * Resolve any additional attributes for the chunk's generated script tag.
      */
     private function resolveScriptTagAttributes(
         string $src,
@@ -416,7 +454,7 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Get the path to an asset when the HMR server is running.
+     * Get the path to an asset when Vite is in hot module replacement mode.
      */
     private function hotAsset(string $path): string
     {
