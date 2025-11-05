@@ -26,7 +26,8 @@
     "phpstan/phpstan": "^2.1",
     "pestphp/pest-plugin-type-coverage": "^4.0",
     "friendsofphp/php-cs-fixer": "^3.89",
-    "mockery/mockery": "^1.6"
+    "mockery/mockery": "^1.6",
+    "mikey179/vfsstream": "^1.6"
   },
   "autoload": {
     "psr-4": {
