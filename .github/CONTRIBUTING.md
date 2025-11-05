@@ -6,16 +6,21 @@ This project welcomes pull requests, bug reports, and feature ideas to help impr
 
 ## Code Style
 
-This project adheres to PSR-12 as the base coding standard. However, code style is fine-tuned and enforced by [StyleCI](https://styleci.io/) to reflect additional project preferences, for example:
+This project adheres to PSR-12 as the base coding standard. However, code style is fine-tuned and enforced
+by [StyleCI](https://styleci.io/) to reflect additional project preferences, for example:
 
 * Always using curly braces in string interpolation
 * Consistent string literal style (single or double quotes where preferred)
-* Minor whitespace, alignment, or readability adjustments 
+* Minor whitespace, alignment, or readability adjustments
 
-Please don’t worry about matching every rule manually; StyleCI will automatically reformat your pull request once it’s submitted.
+Please don’t worry about matching every rule manually; StyleCI will automatically reformat your pull request once it’s
+submitted.
 
 ### PHPDoc
-PHPDoc blocks should be used to provide type information where it cannot be inferred from type declarations alone, for example:
+
+PHPDoc blocks should be used to provide type information where it cannot be inferred from type declarations alone, for
+example:
+
 ```php
 /**
  * @return array<string, mixed>
@@ -26,28 +31,13 @@ public function getConfig(): array
 }
 ```
 
-For more complex types, such as nested arrays or generics, please refer to the [static analysis section](#static-analysis) below for guidance on using custom types to improve readability.
+For more complex types, such as nested arrays or generics, please refer to
+the [static analysis section](#static-analysis) below for guidance on using custom types to improve readability.
 
 ### Local Formatting
-If you'd prefer to format your code locally, before submitting a pull request, you can use [PHP CS Fixer](https://cs.symfony.com/) with the following rules:
 
-```php
-[
-    '@PSR12' => true,
-    '@PhpCsFixer' => true,
-    'assign_null_coalescing_to_coalesce_equal' => true,
-    'concat_space' => ['spacing' => 'one'],
-    'group_import' => true,
-    'increment_style' => ['style' => 'post'],
-    'ordered_interfaces' => true,
-    'phpdoc_align' => ['align' => 'left'],
-    'yoda_style' => [
-        'equal' => false, 
-        'identical' => false, 
-        'less_and_greater' => false
-    ]
-]
-```
+If you'd prefer to format your code locally, before submitting a pull request, you can
+use [PHP CS Fixer](https://cs.symfony.com/) with the provided `.php-cs-fixer.dist.php` configuration file.
 
 ---
 
@@ -57,38 +47,50 @@ This project uses [Pest](https://pestphp.com), for testing, chosen for several r
 
 1. **Expressive syntax:** Pest’s syntax is clean and readable, making tests easy to write and understand.
 2. **Great console output:** Pest’s test runner provides clear and visually appealing feedback.
-3. **Ecosystem of plugins:** Pest plugins (such as the profanity plugin) help in maintaining a clean and professional codebase.
-4. **Mutation testing:** Pest can introduce small changes (mutations) to the code to see if tests catch them, ensuring the code is thoroughly tested.
+3. **Ecosystem of plugins:** Pest plugins (such as the profanity plugin) help in maintaining a clean and professional
+   codebase.
+4. **Mutation testing:** Pest can introduce small changes (mutations) to the code to see if tests catch them, ensuring
+   the code is thoroughly tested.
 
-All tests are located in the `tests/` directory. Tests can be run a variety of ways using Pest's CLI tool or, for convenience, most commonly used commands (and their args) have been added to the project's `composer.json`:
+All tests are located in the `tests/` directory. Tests can be run a variety of ways using Pest's CLI tool or, for
+convenience, most commonly used commands (and their args) have been added to the project's `composer.json`:
 
 ```bash
-composer test               # Run the test suite
-composer test:dirty         # Run only tests affected by recent changes
-composer test:coverage      # Run tests with code coverage report
-composer test:mutate        # Run mutation testing
-composer test:type-coverage # Run type coverage analysis
+composer test               # Run the test suite with Pest.
+composer test:coverage      # Run the test suite and generate a code coverage report, requiring at least 89% coverage.
+composer test:dirty         # Run only the tests affected by recent changes.
+composer test:mutate        # Run mutation testing to evaluate test effectiveness, requiring at least 70% coverage.
+composer test:type-coverage # Check the type coverage of the codebase, requiring at least 80% coverage.
 ```
 
 ---
 
 ## Static Analysis
 
-In addition to unit, feature, or integration testing, this project uses [PHPStan](https://phpstan.org/) for static analysis; typically configured at level 5 for a balanced level of strictness.
+In addition to unit, feature, or integration testing, this project uses [PHPStan](https://phpstan.org/) for static
+analysis; typically configured at level 5 for a balanced level of strictness.
 
 While Pest includes support for type coverage testing, static analysis serves a different and complementary purpose:
 
 * Type coverage ensures that code uses and enforces type declarations consistently.
-* Static analysis inspects code paths, generics, and edge cases that tests may not cover, catching potential issues before they manifest at runtime.
-* Running PHPStan helps identify dead code, invalid assumptions, and incorrect type hints early in the development process.
+* Static analysis inspects code paths, generics, and edge cases that tests may not cover, catching potential issues
+  before they manifest at runtime.
+* Running PHPStan helps identify dead code, invalid assumptions, and incorrect type hints early in the development
+  process.
 
-Some code may have repeated generic types, where more verbosity might be desired. This can affect the readability of a PHPDoc block or, depending on your code editor or IDE, might become a pain to copy-paste. Instead, defining a custom type, similar to what can be done in languages like TypeScript, might be a better solution. 
+Some code may have repeated generic types, where more verbosity might be desired. This can affect the readability of a
+PHPDoc block or, depending on your code editor or IDE, might become a pain to copy-paste. Instead, defining a custom
+type, similar to what can be done in languages like TypeScript, might be a better solution.
 
 ### Custom Type Example
 
-> [!NOTE] Be sure to read the [PHPStan documentation on custom types](https://phpstan.org/developing-extensions/custom-phpdoc-types) before going down this route
+> [!NOTE] Be sure to read
+> the [PHPStan documentation on custom types](https://phpstan.org/developing-extensions/custom-phpdoc-types) before
+> going
+> down this route
 
 Without a custom type, we'd be copy-pasting this block everywhere it's needed:
+
 ```php
 /**
  * @return array<string, {
@@ -107,6 +109,7 @@ Without a custom type, we'd be copy-pasting this block everywhere it's needed:
 ```
 
 With a custom type defined at the start of the class that needs it, we can simplify the above to:
+
 ```php
 /**
  * @phpstan-type ViteManifestChunk array{
@@ -125,6 +128,7 @@ With a custom type defined at the start of the class that needs it, we can simpl
 ```
 
 And then use it like so:
+
 ```php
 /**
  * @return array<string, ViteManifestChunk>
@@ -135,25 +139,33 @@ And then use it like so:
 
 ## Commit Conventions
 
-This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification to keep commit messages consistent and automation-friendly.
+This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification to keep commit
+messages consistent and automation-friendly.
 
 ### Format
+
 Each commit message should follow this general structure:
+
 ```
 <type>[optional scope]: <description>
 ```
 
 #### Examples
+
 Without scope:
+
 ```text
 feat: add support for multiple manifest files
 ```
+
 With scope:
+
 ```text
 fix(tests): correct missing CSS assertion in asset output
 ```
 
 #### Common Types found in project
+
 | Type       | Description                                    |
 |------------|------------------------------------------------|
 | `feat`     | A new feature                                  |
@@ -173,8 +185,9 @@ Following this format helps with automated changelogs, semantic versioning, and 
 1. Fork and clone the repository.
 2. Run `composer install` to install dependencies.
 3. Run `composer test` to ensure everything is set up correctly.
-4. Create a new branch for your feature or bug fix. 
-   > [!NOTE] Please ensure your branch name is descriptive, for example: `feat/add-multiple-manifest-support` or `fix/asset-url-resolution-bug`.
+4. Create a new branch for your feature or bug fix.
+   > [!NOTE] Please ensure your branch name is descriptive, for example: `feat/add-multiple-manifest-support` or
+   `fix/asset-url-resolution-bug`.
 5. Make your changes, ensuring to follow commit conventions outlined above.
 
 ---
@@ -182,6 +195,7 @@ Following this format helps with automated changelogs, semantic versioning, and 
 ## Submitting Changes
 
 Before submitting a pull request, please ensure:
+
 - Commits are focused and atomic.
 - Update any relevant documentation or examples.
 - All tests pass and new tests are added for any new features.
@@ -192,6 +206,7 @@ When ready, open a pull request against the `develop` branch, using the appropri
 ---
 
 ## Feature Requests & Bug Reports
+
 If you’ve found a bug or have an idea for improvement:
 
 1. Check [existing issues](../../issues) to avoid duplicates.
@@ -201,10 +216,12 @@ If you’ve found a bug or have an idea for improvement:
 
 ## Questions or Discussions
 
-If you have general questions, ideas, or want to discuss implementation details, start a [discussion](../../discussions) &mdash; contributions aren’t limited to code.
+If you have general questions, ideas, or want to discuss implementation details, start a [discussion](../../discussions)
+&mdash; contributions aren’t limited to code.
 
 ---
 
 ## License
 
-By contributing, you agree that your submissions will be licensed under the same [MIT license](../LICENSE) as the project.
+By contributing, you agree that your submissions will be licensed under the same [MIT license](../LICENSE) as the
+project.

@@ -1,0 +1,77 @@
+{
+  "name": "builtnoble/vite-php",
+  "description": "Use Vite with PHP templating engines like Twig, Plates, and Laminas View.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "vite",
+    "php",
+    "twig",
+    "plates",
+    "laminas view",
+    "templating engine"
+  ],
+  "authors": [
+    {
+      "name": "Amanda Romero",
+      "email": "thetypescriptslayer@gmail.com",
+      "homepage": "https://github.com/mandicap"
+    }
+  ],
+  "require": {
+      "php": "^8.3 || ~8.4.0"
+  },
+  "require-dev": {
+    "pestphp/pest": "^4.1",
+    "phpstan/phpstan": "^2.1",
+    "pestphp/pest-plugin-type-coverage": "^4.0",
+    "friendsofphp/php-cs-fixer": "^3.89",
+    "mockery/mockery": "^1.6",
+    "mikey179/vfsstream": "^1.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Builtnoble\\VitePHP\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Builtnoble\\VitePHP\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "analyze": "XDEBUG_MODE=off phpstan analyse -c phpstan.neon",
+    "analyze:extension": "phpstan analyse -c phpstan.neon --xdebug",
+    "test": "pest --colors=always",
+    "test:coverage": "pest --coverage --min=89",
+    "test:dirty": "pest --dirty",
+    "test:mutate": "pest --mutate --min=70",
+    "test:type-coverage": "pest --type-coverage --min=80"
+  },
+  "scripts-descriptions": {
+    "analyze": "Run PHPStan static analysis without Xdebug note.",
+    "analyze:extension": "Run PHPStan for debugging custom PHPStan extensions.",
+    "test": "Run the test suite with Pest.",
+    "test:coverage": "Run the test suite and generate a code coverage report, requiring at least 89% coverage.",
+    "test:dirty": "Run only the tests affected by recent changes.",
+    "test:mutate": "Run mutation testing to evaluate test effectiveness, requiring at least 70% coverage.",
+    "test:type-coverage": "Check the type coverage of the codebase, requiring at least 80% coverage."
+  },
+  "scripts-aliases": {
+    "analyze": [
+      "analyse",
+      "phpstan"
+    ],
+    "analyze:extension": [
+      "analyse:extension"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
