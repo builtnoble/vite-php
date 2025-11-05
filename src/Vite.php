@@ -53,7 +53,7 @@ final class Vite implements ViteInterface
     /**
      *  Custom resolver for returning asset paths.
      *
-     * @var callable(string, array): string|null
+     * @var callable(string): string|null
      */
     private $assetPathResolver;
 
@@ -62,12 +62,22 @@ final class Vite implements ViteInterface
      *
      * @throws ViteException if manifest or entry cannot be found or manifest has
      *                       invalid json
-     *
-     * @todo Add support for @vite/client script tag when running HMR and passing of a string as a single entry.
      */
-    public function __invoke(array $entries, ?string $buildDir = null): string
+    public function __invoke(array|string $entries, ?string $buildDir = null): string
     {
+        $entries = is_array($entries) ? $entries : [$entries];
+
         $buildDir ??= $this->buildDir;
+
+        if ($this->isRunningHot()) {
+            array_unshift($entries, '@vite/client');
+            $tags = array_map(
+                fn ($entry) => $this->makeTagForChunk($entry, $this->hotAsset($entry), null, null),
+                $entries
+            );
+
+            return implode('', $tags);
+        }
 
         $manifest = $this->manifestContents($buildDir);
 
@@ -121,36 +131,6 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Set a custom resolver for returning asset paths. For example, Twig has an
-     * asset() function that can be used to return the correct (public) path for
-     * a given asset.
-     */
-    public function setAssetPathResolver(?callable $resolver): self
-    {
-        $this->assetPathResolver = $resolver;
-
-        return $this;
-    }
-
-    /**
-     * Return the public path for a given asset.
-     *
-     * @throws ViteException if manifest file cannot be found or has invalid json
-     */
-    public function asset(string $path, ?string $buildDir = null, array $context = []): string
-    {
-        $buildDir ??= $this->buildDir;
-
-        if ($this->isRunningHot()) {
-            return $this->hotAsset($path);
-        }
-
-        $chunk = $this->chunk($this->manifestContents($buildDir), $path);
-
-        return $this->assetPath("{$buildDir}/{$chunk['file']}", $context);
-    }
-
-    /**
      * Determine if Vite is running in hot module replacement mode.
      */
     public function isRunningHot(): bool
@@ -174,6 +154,34 @@ final class Vite implements ViteInterface
         $this->hotfile = $path;
 
         return $this;
+    }
+
+    /**
+     * Set a custom resolver for returning asset paths.
+     */
+    public function setAssetPathResolver(?callable $resolver): self
+    {
+        $this->assetPathResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Return the public path for a given asset.
+     *
+     * @throws ViteException if manifest file cannot be found or has invalid json
+     */
+    public function asset(string $path, ?string $buildDir = null): string
+    {
+        $buildDir ??= $this->buildDir;
+
+        if ($this->isRunningHot()) {
+            return $this->hotAsset($path);
+        }
+
+        $chunk = $this->chunk($this->manifestContents($buildDir), $path);
+
+        return $this->assetPath("{$buildDir}/{$chunk['file']}");
     }
 
     /**
@@ -267,54 +275,6 @@ final class Vite implements ViteInterface
         $this->styleTagAttributesResolvers[] = $attrs;
 
         return $this;
-    }
-
-    /**
-     * Get the contents of the Vite manifest file.
-     *
-     * @throws ViteException if manifest cannot be found or has invalid json
-     */
-    private function manifestContents(?string $buildDir = null): array
-    {
-        $buildDir ??= $this->buildDir;
-
-        $path = $this->manifestPath($buildDir);
-
-        if (! is_file($path)) {
-            throw new ViteException("Vite manifest not found at path: {$path}");
-        }
-
-        $manifest = json_decode(file_get_contents($path), true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ViteException("Invalid JSON in Vite manifest file at: {$path}");
-        }
-
-        return $manifest;
-    }
-
-    /**
-     * Get the path to the Vite manifest file.
-     */
-    private function manifestPath(?string $buildDir = null): string
-    {
-        $buildDir ??= $this->buildDir;
-
-        return "{$this->publicPath}/{$buildDir}/.vite/{$this->manifestFilename}";
-    }
-
-    /**
-     * Get a specific entry and its elements from the Vite manifest.
-     *
-     * @throws ViteException if entry is cannot be found in manifest
-     */
-    private function chunk(array $manifest, string $entry): array
-    {
-        if (! isset($manifest[$entry])) {
-            throw new ViteException("Unable to find entry in Vite manifest: {$entry}");
-        }
-
-        return $manifest[$entry];
     }
 
     /**
@@ -444,20 +404,68 @@ final class Vite implements ViteInterface
     }
 
     /**
-     * Resolve the asset path using the configured resolver or fallback.
-     */
-    private function assetPath(string $path, array $context = []): string
-    {
-        return $this->assetPathResolver !== null
-            ? ($this->assetPathResolver)($path, $context)
-            : $path;
-    }
-
-    /**
      * Get the path to an asset when Vite is in hot module replacement mode.
      */
     private function hotAsset(string $path): string
     {
         return rtrim(file_get_contents($this->getHotfile())) . '/' . $path;
+    }
+
+    /**
+     * Get the contents of the Vite manifest file.
+     *
+     * @throws ViteException if manifest cannot be found or has invalid json
+     */
+    private function manifestContents(?string $buildDir = null): array
+    {
+        $buildDir ??= $this->buildDir;
+
+        $path = $this->manifestPath($buildDir);
+
+        if (! is_file($path)) {
+            throw new ViteException("Vite manifest not found at path: {$path}");
+        }
+
+        $manifest = json_decode(file_get_contents($path), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ViteException("Invalid JSON in Vite manifest file at: {$path}");
+        }
+
+        return $manifest;
+    }
+
+    /**
+     * Get the path to the Vite manifest file.
+     */
+    private function manifestPath(?string $buildDir = null): string
+    {
+        $buildDir ??= $this->buildDir;
+
+        return "{$this->publicPath}/{$buildDir}/.vite/{$this->manifestFilename}";
+    }
+
+    /**
+     * Get a specific entry and its elements from the Vite manifest.
+     *
+     * @throws ViteException if entry is cannot be found in manifest
+     */
+    private function chunk(array $manifest, string $entry): array
+    {
+        if (! isset($manifest[$entry])) {
+            throw new ViteException("Unable to find entry in Vite manifest: {$entry}");
+        }
+
+        return $manifest[$entry];
+    }
+
+    /**
+     * Resolve the asset path using the configured resolver or fallback.
+     */
+    private function assetPath(string $path): string
+    {
+        return $this->assetPathResolver !== null
+            ? ($this->assetPathResolver)($path)
+            : $path;
     }
 }

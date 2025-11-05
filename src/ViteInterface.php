@@ -17,9 +17,7 @@ interface ViteInterface
     public function __invoke(array $entries, ?string $buildDir = null): string;
 
     /**
-     * Set a custom resolver for returning asset paths. For example, Twig has an
-     * asset() function that can be used to return the correct (public) path for
-     * a given asset.
+     * Set a custom resolver for returning asset paths.
      */
     public function setAssetPathResolver(?callable $resolver): self;
 
@@ -28,7 +26,7 @@ interface ViteInterface
      *
      * @throws ViteException if manifest file cannot be found or has invalid json
      */
-    public function asset(string $path, ?string $buildDir = null, array $context = []): string;
+    public function asset(string $path, ?string $buildDir = null): string;
 
     /**
      * Determine if Vite is running in hot module replacement mode.
