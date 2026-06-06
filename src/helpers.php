@@ -13,7 +13,7 @@ if (! function_exists('partition')) {
      * @param callable $callback The callback function to determine the partitioning.
      *                           It should return true or false.
      *
-     * @return array an array containing two arrays: the first with elements
+     * @return array<int, mixed[]> an array containing two arrays: the first with elements
      *               for which the callback returned true, and the second with
      *               elements for which it returned false
      */
