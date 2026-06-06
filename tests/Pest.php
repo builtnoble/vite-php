@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Builtnoble\VitePHP\Tests\TestCase;
 
 pest()->project()->github('builtnoble/vite-php');
