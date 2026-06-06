@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use org\bovigo\vfs\vfsStream;
 
-beforeAll(function () {
+beforeAll(function (): void {
     makeManifestFiles([
         'app.js' => [
             'file' => 'app.123456.js',
@@ -19,16 +19,16 @@ beforeAll(function () {
     ]);
 });
 
-afterAll(function () {
+afterAll(function (): void {
     // Clean up the virtual file system
     vfsStream::setup();
 });
 
-describe('Unit/Tags', function () {
+describe('Unit/Tags', function (): void {
     beforeEach()->initializeVite();
 
-    describe('Attributes', function () {
-        it('adds nonce attribute if nonce is set with a string', function () {
+    describe('Attributes', function (): void {
+        it('adds nonce attribute if nonce is set with a string', function (): void {
             $nonce = 'test-nonce';
 
             $this->vite->setNonce($nonce);
@@ -42,7 +42,7 @@ describe('Unit/Tags', function () {
                 );
         });
 
-        it('generates 40 character random string when calling setNonce w/o argument', function () {
+        it('generates 40 character random string when calling setNonce w/o argument', function (): void {
             $this->vite->setNonce();
             $nonce = $this->vite->getNonce();
 
@@ -56,7 +56,7 @@ describe('Unit/Tags', function () {
                 );
         });
 
-        it('adds integrity attribute if integrityKey is set with a string', function () {
+        it('adds integrity attribute if integrityKey is set with a string', function (): void {
             $this->vite->setIntegrityKey('test-integrity-key');
 
             expect(($this->vite)(['app.js', 'app.css']))->toBe(
@@ -67,7 +67,7 @@ describe('Unit/Tags', function () {
             );
         });
 
-        it('does not add integrity attribute if integrityKey is set but missing in manifest', function () {
+        it('does not add integrity attribute if integrityKey is set but missing in manifest', function (): void {
             $this->vite->setIntegrityKey('missing-integrity-key');
 
             expect(($this->vite)(['app.js', 'app.css']))->toBe(
@@ -78,7 +78,7 @@ describe('Unit/Tags', function () {
             );
         });
 
-        it('does not add integrity attribute if integrityKey is not set', function () {
+        it('does not add integrity attribute if integrityKey is not set', function (): void {
             expect(($this->vite)(['app.js', 'app.css']))->toBe(
                 implode(PHP_EOL, [
                     '<link rel="stylesheet" href="build/app.654321.css" />',
@@ -87,7 +87,7 @@ describe('Unit/Tags', function () {
             );
         });
 
-        it('does not set add integrity attribute if integrityKey is set to false', function () {
+        it('does not set add integrity attribute if integrityKey is set to false', function (): void {
             $this->vite->setIntegrityKey(false);
 
             expect(($this->vite)(['app.js', 'app.css']))->toBe(

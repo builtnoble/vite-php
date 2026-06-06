@@ -7,7 +7,7 @@ use org\bovigo\vfs\vfsStream;
 
 covers(Vite::class);
 
-beforeAll(function () {
+beforeAll(function (): void {
     makeManifestFiles([
         'app.js' => [
             'file' => 'assets/app.abc123.js',
@@ -36,14 +36,14 @@ beforeAll(function () {
     ]);
 });
 
-afterAll(function () {
+afterAll(function (): void {
     // Clean up the virtual file system
     vfsStream::setup();
 });
 
 beforeEach()->initializeVite();
 
-it('throws exception if the manifest file is missing', function () {
+it('throws exception if the manifest file is missing', function (): void {
     $this->vite->setBuildDir('non/existent/path');
 
     expect(fn () => ($this->vite)(['app.js', 'app.css']))
@@ -53,7 +53,7 @@ it('throws exception if the manifest file is missing', function () {
         );
 });
 
-it('throws exception if manifest is not valid JSON', function () {
+it('throws exception if manifest is not valid JSON', function (): void {
     $this->vite->setManifestFilename('invalid_manifest.json');
 
     expect(fn () => ($this->vite)(['app.js', 'app.css']))
@@ -63,14 +63,14 @@ it('throws exception if manifest is not valid JSON', function () {
         );
 });
 
-it('throws exception if entry is missing in manifest', function () {
+it('throws exception if entry is missing in manifest', function (): void {
     expect(fn () => ($this->vite)(['missing_entry.js']))->toThrow(
         ViteException::class,
         'Unable to find entry in Vite manifest: missing_entry.js'
     );
 });
 
-it('respects explicit buildDir when provided to __invoke', function () {
+it('respects explicit buildDir when provided to __invoke', function (): void {
     $this->vite->setBuildDir('other');
 
     expect(($this->vite)(['app.js'], 'build'))->toBe(
@@ -78,13 +78,13 @@ it('respects explicit buildDir when provided to __invoke', function () {
     );
 });
 
-it('respects explicit buildDir when provided to asset()', function () {
+it('respects explicit buildDir when provided to asset()', function (): void {
     $this->vite->setBuildDir('other');
 
     expect($this->vite->asset('app.js', 'build'))->toBe("{$this->buildDir}/assets/app.abc123.js");
 });
 
-it('removes duplicate stylesheet tags across entries', function () {
+it('removes duplicate stylesheet tags across entries', function (): void {
     // shared.js and vendor.js both reference the same shared.css (vendor imports shared.js)
     expect(($this->vite)(['shared.js', 'vendor.js']))->toBe(
         implode(PHP_EOL, [
@@ -95,7 +95,7 @@ it('removes duplicate stylesheet tags across entries', function () {
     );
 });
 
-it('selects the correct manifest key when multiple entries reference the same CSS file', function () {
+it('selects the correct manifest key when multiple entries reference the same CSS file', function (): void {
     // create a custom build dir with a manifest containing duplicate CSS file values
     $buildDir = 'dupbuild';
     $manifestDir = "{$this->publicPath}/{$buildDir}/.vite";
@@ -140,7 +140,7 @@ it('selects the correct manifest key when multiple entries reference the same CS
     @unlink("{$manifestDir}/manifest.json");
 });
 
-it('resolves correct manifest key for imported styles when using a style resolver', function () {
+it('resolves correct manifest key for imported styles when using a style resolver', function (): void {
     // Add a resolver that exposes the manifest key used to create the stylesheet tag.
     $this->vite->setStyleTagAttributesResolvers(
         fn (string $src, string $url, ?array $chunk = null, ?array $m = null) => ['data-src' => $src]
@@ -156,7 +156,7 @@ it('resolves correct manifest key for imported styles when using a style resolve
     );
 });
 
-it('concatenates multiple stylesheet tags without injecting an unexpected separator', function () {
+it('concatenates multiple stylesheet tags without injecting an unexpected separator', function (): void {
     expect(($this->vite)(['app.css', 'shared.css']))->toBe(
         implode(PHP_EOL, [
             "<link rel=\"stylesheet\" href=\"{$this->buildDir}/assets/app.def456.css\" />",
@@ -165,20 +165,20 @@ it('concatenates multiple stylesheet tags without injecting an unexpected separa
     );
 });
 
-it('generates correct script tag for single JS entry', function () {
+it('generates correct script tag for single JS entry', function (): void {
     expect(($this->vite)('app.js'))
         ->toBe(
             "<script type=\"module\" src=\"{$this->buildDir}/assets/app.abc123.js\"></script>" . PHP_EOL
         );
 });
 
-it('generates correct link tag for single CSS entry', function () {
+it('generates correct link tag for single CSS entry', function (): void {
     expect(($this->vite)('app.css'))->toBe(
         "<link rel=\"stylesheet\" href=\"{$this->buildDir}/assets/app.def456.css\" />" . PHP_EOL
     );
 });
 
-it('generates tags for valid entries with associated CSS and JS', function () {
+it('generates tags for valid entries with associated CSS and JS', function (): void {
     expect(($this->vite)('shared.js'))->toBe(
         implode(
             PHP_EOL,
@@ -190,7 +190,7 @@ it('generates tags for valid entries with associated CSS and JS', function () {
     );
 });
 
-it('generates correct tags for multiple entries', function () {
+it('generates correct tags for multiple entries', function (): void {
     expect(($this->vite)(['app.js', 'app.css']))->toBe(
         implode(PHP_EOL, [
             "<link rel=\"stylesheet\" href=\"{$this->buildDir}/assets/app.def456.css\" />",
@@ -199,7 +199,7 @@ it('generates correct tags for multiple entries', function () {
     );
 });
 
-it('generates correct tags for entry with imports', function () {
+it('generates correct tags for entry with imports', function (): void {
     expect(($this->vite)('vendor.js'))->toBe(
         implode(PHP_EOL, [
             "<link rel=\"stylesheet\" href=\"{$this->buildDir}/assets/shared.def456.css\" />",
