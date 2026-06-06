@@ -72,7 +72,7 @@ final class Vite implements ViteInterface
         if ($this->isRunningHot()) {
             array_unshift($entries, '@vite/client');
             $tags = array_map(
-                fn ($entry): string => $this->makeTagForChunk($entry, $this->hotAsset($entry), null, null),
+                fn (string $entry): string => $this->makeTagForChunk($entry, $this->hotAsset($entry), null, null),
                 $entries
             );
 
