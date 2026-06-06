@@ -14,8 +14,8 @@ if (! function_exists('partition')) {
      *                           It should return true or false.
      *
      * @return array<int, mixed[]> an array containing two arrays: the first with elements
-     *               for which the callback returned true, and the second with
-     *               elements for which it returned false
+     *                             for which the callback returned true, and the second with
+     *                             elements for which it returned false
      */
     function partition(array $array, callable $callback): array
     {

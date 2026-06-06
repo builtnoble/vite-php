@@ -22,9 +22,10 @@ final class ViteFactory
      *  - manifestFilename: string
      *  - integrityKey: string|false
      *
+     * @param array<string, mixed> $options
+     *
      * @throws RandomException if nonce generation is requested and fails
      * @throws ViteException
-     * @param array<string, mixed> $options
      */
     public static function make(array $options = [], ?callable $creator = null): ViteInterface
     {

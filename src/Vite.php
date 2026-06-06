@@ -42,12 +42,14 @@ final class Vite implements ViteInterface
 
     /**
      * Additional attributes to add to the script tags when generating.
+     *
      * @var callable[]
      */
     private array $scriptTagAttributesResolvers = [];
 
     /**
      * Additional attributes to add to the style tags when generating.
+     *
      * @var callable[]
      */
     private array $styleTagAttributesResolvers = [];
@@ -332,6 +334,7 @@ final class Vite implements ViteInterface
 
     /**
      * Parse the attributes into key="value" strings.
+     *
      * @return int[]|string[]
      */
     private function parseAttributes(array $attrs): array
@@ -448,8 +451,9 @@ final class Vite implements ViteInterface
     /**
      * Get a specific entry and its elements from the Vite manifest.
      *
-     * @throws ViteException if entry is cannot be found in manifest
      * @param array<string, mixed> $manifest
+     *
+     * @throws ViteException if entry is cannot be found in manifest
      */
     private function chunk(array $manifest, string $entry): array
     {
