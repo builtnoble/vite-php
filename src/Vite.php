@@ -332,6 +332,7 @@ final class Vite implements ViteInterface
 
     /**
      * Parse the attributes into key="value" strings.
+     * @return int[]|string[]
      */
     private function parseAttributes(array $attrs): array
     {
@@ -342,11 +343,7 @@ final class Vite implements ViteInterface
                 continue;
             }
 
-            if ($value === true) {
-                $result[] = $key;
-            } else {
-                $result[] = $key . '="' . $value . '"';
-            }
+            $result[] = $value === true ? $key : $key . '="' . $value . '"';
         }
 
         return $result;
