@@ -1,0 +1,109 @@
+# builtnoble/vite-php
+
+> A framework-agnostic PHP library that reads Vite's manifest.json and outputs the correct `<script>` and `<link>` tags for both development (HMR) and production environments. Intended as a core utility for integrating Vite into standalone PHP apps or templating engine extensions (Twig, Plates, Laminas View).
+
+## Installation
+
+```bash
+composer require builtnoble/vite-php
+```
+
+Requires PHP 8.5+.
+
+## Quickstart
+
+```php
+use Builtnoble\VitePHP\ViteFactory;
+
+$vite = ViteFactory::make([
+    'publicPath' => 'public',   // where your public/ dir is (default: 'public')
+    'buildDir'   => 'dist',     // matches vite.config.js build.outDir (default: 'build')
+]);
+
+// Call the instance with your entry points — returns an HTML string of <script>/<link> tags
+echo ($vite)(['resources/js/app.js', 'resources/css/app.css']);
+```
+
+The returned string contains all `<link rel="stylesheet">` tags followed by all `<script type="module">` tags, including any CSS chunks referenced via `imports` in the manifest.
+
+## ViteFactory::make() options
+
+| Option                        | Type                   | Default           | Description |
+|-------------------------------|------------------------|-------------------|-------------|
+| `publicPath`                  | `string`               | `'public'`        | Path to your public directory |
+| `buildDir`                    | `string`               | `'build'`         | Vite output directory (must match `build.outDir` in vite.config.js) |
+| `manifestFilename`            | `string`               | `'manifest.json'` | Name of the manifest file inside `{publicPath}/{buildDir}/.vite/` |
+| `hotfile`                     | `string`               | `'{publicPath}/hot'` | Path to the HMR hotfile written by the Vite dev server |
+| `nonce`                       | `string\|null`         | not set           | CSP nonce added to all tags; pass `null` to auto-generate a 40-char random nonce |
+| `integrityKey`                | `string\|false`        | `'integrity'`     | Manifest key for the SRI hash; set `false` to disable |
+| `assetPathResolver`           | `callable\|null`       | `null`            | Custom callable `(string $path): string` to rewrite asset URLs |
+| `scriptTagAttributesResolvers`| `callable\|callable[]` | `[]`              | Callable(s) `($src, $url, $chunk, $manifest): array` returning extra `<script>` attributes |
+| `styleTagAttributesResolvers` | `callable\|callable[]` | `[]`              | Callable(s) `($src, $url, $chunk, $manifest): array` returning extra `<link>` attributes |
+
+A second optional `$creator` callable can be passed to `ViteFactory::make()` to supply a custom `Vite` instance (useful when extending the class).
+
+## Manifest path convention
+
+Manifests are resolved at: `{publicPath}/{buildDir}/.vite/{manifestFilename}`
+
+Example with defaults: `public/build/.vite/manifest.json`
+
+Your `vite.config.js` should set `build.manifest: true` (or `build.manifest: 'manifest.json'`) and `build.outDir: 'public/build'` to match.
+
+## HMR (development) mode
+
+When the hotfile exists on disk, HMR mode is active. The hotfile is written by the Vite dev server and contains the dev server base URL (e.g. `http://localhost:5173`). In this mode, the `@vite/client` script is injected automatically and asset URLs point to the dev server instead of the manifest.
+
+## Getting a single asset URL
+
+```php
+$url = $vite->asset('resources/images/logo.png');
+```
+
+Works in both HMR and production mode.
+
+## CSP nonce
+
+```php
+$vite = ViteFactory::make(['nonce' => null]); // auto-generates a nonce
+$nonce = $vite->getNonce();                   // retrieve it to set your CSP header
+```
+
+## Custom attribute resolvers
+
+```php
+$vite = ViteFactory::make([
+    'scriptTagAttributesResolvers' => function (string $src, string $url, ?array $chunk, ?array $manifest): array {
+        return ['crossorigin' => 'anonymous'];
+    },
+    'styleTagAttributesResolvers' => [
+        function (string $src, string $url, ?array $chunk, ?array $manifest): array {
+            return ['media' => 'all'];
+        },
+    ],
+]);
+```
+
+## Custom asset path resolver
+
+Useful when assets are served from a CDN or prefixed path:
+
+```php
+$vite = ViteFactory::make([
+    'assetPathResolver' => fn (string $path): string => 'https://cdn.example.com/' . $path,
+]);
+```
+
+## ViteInterface
+
+All public methods are defined in `ViteInterface`. When type-hinting in your own code, use `ViteInterface` rather than the concrete `Vite` class.
+
+## Error handling
+
+`ViteException` is thrown when:
+- The manifest file does not exist at the expected path
+- The manifest file contains invalid JSON
+- An entry point is not found in the manifest
+- A creator callable does not return a `ViteInterface` instance
+
+`\Random\RandomException` may be thrown when `nonce => null` is passed and random byte generation fails (rare).
