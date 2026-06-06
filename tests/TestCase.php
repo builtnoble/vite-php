@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Builtnoble\VitePHP\Tests;
 
 use Builtnoble\VitePHP\{ViteException, ViteInterface};

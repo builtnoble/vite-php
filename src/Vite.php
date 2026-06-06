@@ -42,11 +42,15 @@ final class Vite implements ViteInterface
 
     /**
      * Additional attributes to add to the script tags when generating.
+     *
+     * @var callable[]
      */
     private array $scriptTagAttributesResolvers = [];
 
     /**
      * Additional attributes to add to the style tags when generating.
+     *
+     * @var callable[]
      */
     private array $styleTagAttributesResolvers = [];
 
@@ -72,7 +76,7 @@ final class Vite implements ViteInterface
         if ($this->isRunningHot()) {
             array_unshift($entries, '@vite/client');
             $tags = array_map(
-                fn ($entry) => $this->makeTagForChunk($entry, $this->hotAsset($entry), null, null),
+                fn (string $entry): string => $this->makeTagForChunk($entry, $this->hotAsset($entry)),
                 $entries
             );
 
@@ -90,7 +94,7 @@ final class Vite implements ViteInterface
                 foreach ($manifest[$import]['css'] ?? [] as $css) {
                     $partialManifest = array_filter(
                         $manifest,
-                        fn (array $item) => isset($item['file']) && $item['file'] === $css
+                        fn (array $item): bool => isset($item['file']) && $item['file'] === $css
                     );
 
                     $tags[] = $this->makeTagForChunk(
@@ -112,7 +116,7 @@ final class Vite implements ViteInterface
             foreach ($chunk['css'] ?? [] as $css) {
                 $partialManifest = array_filter(
                     $manifest,
-                    fn (array $item) => isset($item['file']) && $item['file'] === $css
+                    fn (array $item): bool => isset($item['file']) && $item['file'] === $css
                 );
 
                 $tags[] = $this->makeTagForChunk(
@@ -125,7 +129,7 @@ final class Vite implements ViteInterface
         }
 
         // Separate stylesheets and scripts from unique tags.
-        [$stylesheets, $scripts] = partition(array_unique($tags), fn (string $tag) => str_starts_with($tag, '<link'));
+        [$stylesheets, $scripts] = partition(array_unique($tags), fn (string $tag): bool => str_starts_with($tag, '<link'));
 
         return implode('', $stylesheets) . implode('', $scripts);
     }
@@ -253,7 +257,7 @@ final class Vite implements ViteInterface
     public function setScriptTagAttributesResolvers(array|callable $attrs): self
     {
         if (! is_callable($attrs)) {
-            $attrs = fn () => $attrs;
+            $attrs = fn (): array => $attrs;
         }
 
         $this->scriptTagAttributesResolvers[] = $attrs;
@@ -269,7 +273,7 @@ final class Vite implements ViteInterface
     public function setStyleTagAttributesResolvers(array|callable $attrs): self
     {
         if (! is_callable($attrs)) {
-            $attrs = fn () => $attrs;
+            $attrs = fn (): array => $attrs;
         }
 
         $this->styleTagAttributesResolvers[] = $attrs;
@@ -330,6 +334,8 @@ final class Vite implements ViteInterface
 
     /**
      * Parse the attributes into key="value" strings.
+     *
+     * @return int[]|string[]
      */
     private function parseAttributes(array $attrs): array
     {
@@ -339,11 +345,8 @@ final class Vite implements ViteInterface
             if ($value === false || $value === null) {
                 continue;
             }
-            if ($value === true) {
-                $result[] = $key;
-            } else {
-                $result[] = $key . '="' . $value . '"';
-            }
+
+            $result[] = $value === true ? $key : $key . '="' . $value . '"';
         }
 
         return $result;
@@ -447,6 +450,8 @@ final class Vite implements ViteInterface
 
     /**
      * Get a specific entry and its elements from the Vite manifest.
+     *
+     * @param array<string, mixed> $manifest
      *
      * @throws ViteException if entry is cannot be found in manifest
      */

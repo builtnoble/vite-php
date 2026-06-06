@@ -11,8 +11,8 @@ use org\bovigo\vfs\vfsStream;
  */
 function makeManifestFiles(array $entries, ?string $publicPath = '/public', ?string $buildDir = 'build'): void
 {
-    vfsStream::setup(trim($publicPath, '/'), null, [
-        trim($buildDir, '/') => [
+    vfsStream::setup(trim((string) $publicPath, '/'), null, [
+        trim((string) $buildDir, '/') => [
             '.vite' => [
                 'manifest.json' => json_encode($entries, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
                 'invalid_manifest.json' => '{ invalidJson: true,}',
