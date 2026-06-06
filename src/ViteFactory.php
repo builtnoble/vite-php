@@ -24,6 +24,7 @@ final class ViteFactory
      *
      * @throws RandomException if nonce generation is requested and fails
      * @throws ViteException
+     * @param array<string, mixed> $options
      */
     public static function make(array $options = [], ?callable $creator = null): ViteInterface
     {

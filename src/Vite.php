@@ -450,6 +450,7 @@ final class Vite implements ViteInterface
      * Get a specific entry and its elements from the Vite manifest.
      *
      * @throws ViteException if entry is cannot be found in manifest
+     * @param array<string, mixed> $manifest
      */
     private function chunk(array $manifest, string $entry): array
     {
