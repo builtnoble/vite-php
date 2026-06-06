@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use org\bovigo\vfs\vfsStream;
 
-beforeAll(function () {
+beforeAll(function (): void {
     makeManifestFiles([
         'app.js' => [
             'file' => 'app.123456.js',
@@ -17,31 +17,31 @@ beforeAll(function () {
     ]);
 });
 
-afterAll(function () {
+afterAll(function (): void {
     // Clean up the virtual file system
     vfsStream::setup();
 });
 
-describe('Unit/Resolvers', function () {
+describe('Unit/Resolvers', function (): void {
     beforeEach()->initializeVite();
 
-    describe('Asset Path Resolver', function () {
-        it('can set a resolver for asset paths', function () {
-            $this->vite->setAssetPathResolver(fn (string $path) => str_replace($this->buildDir, 'cdn', $path));
+    describe('Asset Path Resolver', function (): void {
+        it('can set a resolver for asset paths', function (): void {
+            $this->vite->setAssetPathResolver(fn (string $path): string => str_replace($this->buildDir, 'cdn', $path));
 
             expect($this->vite->asset('app.js'))->toBe('cdn/app.123456.js')
                 ->and($this->vite->asset('app.css'))->toBe('cdn/app.654321.css');
         });
 
-        it('falls back to original asset path handling when resolver is set to null', function () {
+        it('falls back to original asset path handling when resolver is set to null', function (): void {
             $this->vite->setAssetPathResolver(null);
 
             expect($this->vite->asset('app.js'))->toBe('build/app.123456.js')
                 ->and($this->vite->asset('app.css'))->toBe('build/app.654321.css');
         });
 
-        it('returns original asset path when HMR is enabled regardless of resolver being set', function () {
-            $this->vite->setAssetPathResolver(fn (string $path) => str_replace($this->buildDir, 'cdn', $path));
+        it('returns original asset path when HMR is enabled regardless of resolver being set', function (): void {
+            $this->vite->setAssetPathResolver(fn (string $path): string => str_replace($this->buildDir, 'cdn', $path));
 
             @file_put_contents("{$this->publicPath}/hot", 'https://localhost:3000');
             $viteServerUrl = @file_get_contents("{$this->publicPath}/hot");
@@ -54,10 +54,10 @@ describe('Unit/Resolvers', function () {
         });
     });
 
-    describe('Attribute Resolvers', function () {
-        it('can accept callable resolvers and apply the attributes to script and link tags', function () {
-            $this->vite->setScriptTagAttributesResolvers(fn ($src, $url, $chunk, $manifest) => ['defer' => true]);
-            $this->vite->setStyleTagAttributesResolvers(fn ($href, $url, $chunk, $manifest) => ['media' => 'print']);
+    describe('Attribute Resolvers', function (): void {
+        it('can accept callable resolvers and apply the attributes to script and link tags', function (): void {
+            $this->vite->setScriptTagAttributesResolvers(fn ($src, $url, $chunk, $manifest): array => ['defer' => true]);
+            $this->vite->setStyleTagAttributesResolvers(fn ($href, $url, $chunk, $manifest): array => ['media' => 'print']);
 
             expect(($this->vite)(['app.js', 'app.css']))->toBe(
                 implode(PHP_EOL, [
@@ -67,7 +67,7 @@ describe('Unit/Resolvers', function () {
             );
         });
 
-        it('can accept associative array resolvers and apply the attributes to script and link tags', function () {
+        it('can accept associative array resolvers and apply the attributes to script and link tags', function (): void {
             $this->vite->setScriptTagAttributesResolvers(['defer' => true]);
             $this->vite->setStyleTagAttributesResolvers(['media' => 'print']);
 
@@ -79,12 +79,12 @@ describe('Unit/Resolvers', function () {
             );
         });
 
-        it('can accept multiple and mixed resolvers and merges the attributes correctly', function () {
-            $this->vite->setScriptTagAttributesResolvers(fn ($src, $url, $chunk, $manifest) => ['defer' => true]);
+        it('can accept multiple and mixed resolvers and merges the attributes correctly', function (): void {
+            $this->vite->setScriptTagAttributesResolvers(fn ($src, $url, $chunk, $manifest): array => ['defer' => true]);
             $this->vite->setScriptTagAttributesResolvers(['crossorigin' => 'anonymous']);
 
             $this->vite->setStyleTagAttributesResolvers(
-                fn ($href, $url, $chunk, $manifest) => ['integrity' => 'sha384-xyz']
+                fn ($href, $url, $chunk, $manifest): array => ['integrity' => 'sha384-xyz']
             );
             $this->vite->setStyleTagAttributesResolvers(['media' => 'print']);
 
@@ -96,8 +96,8 @@ describe('Unit/Resolvers', function () {
             );
         });
 
-        it('does not add attributes if resolver returns an empty array', function () {
-            $this->vite->setScriptTagAttributesResolvers(fn ($src, $url, $chunk, $manifest) => []);
+        it('does not add attributes if resolver returns an empty array', function (): void {
+            $this->vite->setScriptTagAttributesResolvers(fn ($src, $url, $chunk, $manifest): array => []);
             $this->vite->setStyleTagAttributesResolvers([]);
 
             expect(($this->vite)(['app.js', 'app.css']))->toBe(
@@ -108,7 +108,7 @@ describe('Unit/Resolvers', function () {
             );
         });
 
-        it('handles non-callable array resolvers gracefully', function () {
+        it('handles non-callable array resolvers gracefully', function (): void {
             $this->vite->setScriptTagAttributesResolvers(['invalid' => null, 'async' => true]);
             $this->vite->setStyleTagAttributesResolvers(['invalid' => null, 'media' => 'all']);
 

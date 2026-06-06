@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Builtnoble\VitePHP\ViteException;
 
-describe('partition', function () {
+describe('partition', function (): void {
     dataset('partition_dataset', [
         'mixed keys' => [
             ['a' => 1, 'b' => 2, 'c' => 3, 4 => 4],
@@ -30,8 +30,8 @@ describe('partition', function () {
 
     it(
         'splits array into true and false groups preserving keys',
-        function (array $data, array $expectedEvens, array $expectedOdds) {
-            [$evens, $odds] = partition($data, fn ($value, $key) => $value % 2 === 0);
+        function (array $data, array $expectedEvens, array $expectedOdds): void {
+            [$evens, $odds] = partition($data, fn ($value, $key): bool => $value % 2 === 0);
 
             expect($evens)->toEqual($expectedEvens)
                 ->and($odds)->toEqual($expectedOdds);
@@ -39,7 +39,7 @@ describe('partition', function () {
     )->with('partition_dataset');
 });
 
-describe('randomStr', function () {
+describe('randomStr', function (): void {
     dataset('random_length_dataset', [
         'len_1' => [1],
         'len_16' => [16],
@@ -49,7 +49,7 @@ describe('randomStr', function () {
 
     it(
         'returns string of requested length with alphanumeric chars',
-        function (int $length) {
+        function (int $length): void {
             $str = randomStr($length);
 
             expect($str)->toBeString()
@@ -58,7 +58,7 @@ describe('randomStr', function () {
         }
     )->with('random_length_dataset');
 
-    it('returns different values across calls', function (int $length) {
+    it('returns different values across calls', function (int $length): void {
         // For very short lengths, we need to try multiple times due to limited character space
         if ($length === 1) {
             $values = [];
@@ -77,8 +77,8 @@ describe('randomStr', function () {
     })->with('random_length_dataset');
 });
 
-describe('normalizeResolvers', function () {
-    it('wraps a single callable into an array', function () {
+describe('normalizeResolvers', function (): void {
+    it('wraps a single callable into an array', function (): void {
         $callable = fn (): array => ['defer' => true];
 
         $result = normalizeResolvers($callable);
@@ -89,7 +89,7 @@ describe('normalizeResolvers', function () {
             ->and($result[0]())->toEqual(['defer' => true]);
     });
 
-    it('accepts an array of callables and reindexes keys', function () {
+    it('accepts an array of callables and reindexes keys', function (): void {
         $a = fn (): array => ['a' => 1];
         $b = fn (): array => ['b' => 2];
 
@@ -102,7 +102,7 @@ describe('normalizeResolvers', function () {
             ->and($result[1])->toBe($b);
     });
 
-    it('accepts an associative array of attribute arrays and preserves order while reindexing', function () {
+    it('accepts an associative array of attribute arrays and preserves order while reindexing', function (): void {
         $a = ['defer' => true];
         $b = ['media' => 'all'];
 
@@ -115,7 +115,7 @@ describe('normalizeResolvers', function () {
             ->and($result[1])->toBe($b);
     });
 
-    it('accepts mixed callables and attribute arrays and reindexes', function () {
+    it('accepts mixed callables and attribute arrays and reindexes', function (): void {
         $a = ['defer' => true];
         $b = fn (): array => ['media' => 'all'];
 
@@ -128,23 +128,23 @@ describe('normalizeResolvers', function () {
             ->and($result[1])->toBe($b);
     });
 
-    it('returns an empty array for an empty input array', function () {
+    it('returns an empty array for an empty input array', function (): void {
         $result = normalizeResolvers([]);
 
         expect($result)->toBeArray()
             ->and(count($result))->toBe(0);
     });
 
-    it('throws ViteException for non-callable non-array values', function () {
-        expect(fn () => normalizeResolvers('not-callable-or-array'))->toThrow(ViteException::class);
+    it('throws ViteException for non-callable non-array values', function (): void {
+        expect(fn (): array => normalizeResolvers('not-callable-or-array'))->toThrow(ViteException::class);
     });
 
-    it('throws ViteException when an array contains invalid element types', function () {
+    it('throws ViteException when an array contains invalid element types', function (): void {
         $input = [
             'valid' => ['defer' => true],
             'invalid' => 'string-value',
         ];
 
-        expect(fn () => normalizeResolvers($input))->toThrow(ViteException::class);
+        expect(fn (): array => normalizeResolvers($input))->toThrow(ViteException::class);
     });
 });

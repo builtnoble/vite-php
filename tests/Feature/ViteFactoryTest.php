@@ -6,30 +6,30 @@ use Builtnoble\VitePHP\{ViteException, ViteFactory, ViteInterface};
 
 covers(ViteFactory::class);
 
-describe('Vite Factory', function () {
-    it('throws exception if creator is not a valid Vite instance', function () {
-        $invalidCreator = fn () => new stdClass();
+describe('Vite Factory', function (): void {
+    it('throws exception if creator is not a valid Vite instance', function (): void {
+        $invalidCreator = fn (): \stdClass => new stdClass();
 
-        expect(fn () => ViteFactory::make(creator: $invalidCreator))->toThrow(
+        expect(fn (): \Builtnoble\VitePHP\ViteInterface => ViteFactory::make(creator: $invalidCreator))->toThrow(
             ViteException::class,
             'The creator callable must return an instance of Builtnoble\VitePHP\Vite'
         );
     });
 
-    it('creates a Vite instance with no options provided', function () {
+    it('creates a Vite instance with no options provided', function (): void {
         $viteFactory = ViteFactory::make(creator: $this->creator);
 
         expect($viteFactory)->toBeInstanceOf(ViteInterface::class)
             ->and($viteFactory->getHotfile())->toBe('public/hot')
             ->and($viteFactory->getNonce())->toBeNull()
             ->and($viteFactory->isRunningHot())->toBeFalse()
-            ->and(fn () => $viteFactory->asset('app.js'))->toThrow(
+            ->and(fn (): string => $viteFactory->asset('app.js'))->toThrow(
                 ViteException::class,
                 'Vite manifest not found at path: public/build/.vite/manifest.json'
             );
     });
 
-    it('casts string options to string when non-string is provided', function () {
+    it('casts string options to string when non-string is provided', function (): void {
         $options = [
             'hotfile' => 123,
             'buildDir' => 456,
@@ -71,13 +71,13 @@ describe('Vite Factory', function () {
         $viteFactory = ViteFactory::make($options, $this->creator);
 
         expect($viteFactory->getHotfile())->toBe('123')
-            ->and(fn () => $viteFactory->asset('app.js'))->toThrow(
+            ->and(fn (): string => $viteFactory->asset('app.js'))->toThrow(
                 ViteException::class,
                 $message
             );
     });
 
-    it('converts callable resolvers to an array', function () {
+    it('converts callable resolvers to an array', function (): void {
         $scriptResolver = fn (): array => ['defer' => true];
         $styleResolver = fn (): array => ['media' => 'all'];
 
@@ -109,7 +109,7 @@ describe('Vite Factory', function () {
         expect(($viteFactory)(['app.js', 'app.css']))->toBe($html);
     });
 
-    it('does not call setter for empty array resolvers', function () {
+    it('does not call setter for empty array resolvers', function (): void {
         $this->viteMock->shouldReceive('setScriptTagAttributesResolvers')->never();
 
         $vite = ViteFactory::make(['scriptTagAttributesResolvers' => []], $this->creator);
@@ -117,7 +117,7 @@ describe('Vite Factory', function () {
         expect($vite)->toBeInstanceOf(ViteInterface::class);
     });
 
-    it('accepts a callable asset path resolver', function () {
+    it('accepts a callable asset path resolver', function (): void {
         $resolver = fn (string $path): string => '/custom/' . ltrim($path, '/');
 
         $this->viteMock->shouldReceive('setAssetPathResolver')
@@ -137,7 +137,7 @@ describe('Vite Factory', function () {
         expect($viteFactory->asset('app.js'))->toBe('/custom/build/assets/app.abc123.js');
     });
 
-    it('accepts a string for integrityKey option', function () {
+    it('accepts a string for integrityKey option', function (): void {
         $html = '<script src="assets/app.abc123.js" integrity="sha256-xyz789"></script>';
 
         $this->viteMock->shouldReceive('setIntegrityKey')
@@ -157,7 +157,7 @@ describe('Vite Factory', function () {
         expect(($viteFactory)(['app.js']))->toBe($html);
     });
 
-    it('accepts false for integrityKey option', function () {
+    it('accepts false for integrityKey option', function (): void {
         $html = '<script src="assets/app.abc123.js"></script>';
 
         $this->viteMock->shouldReceive('setIntegrityKey')
@@ -177,7 +177,7 @@ describe('Vite Factory', function () {
         expect(($viteFactory)(['app.js']))->toBe($html);
     });
 
-    it('accepts null to generate a random nonce', function () {
+    it('accepts null to generate a random nonce', function (): void {
         $this->viteMock->shouldReceive('setNonce')
             ->once()
             ->with(null)
