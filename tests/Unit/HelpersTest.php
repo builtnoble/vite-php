@@ -31,7 +31,7 @@ describe('partition', function (): void {
     it(
         'splits array into true and false groups preserving keys',
         function (array $data, array $expectedEvens, array $expectedOdds): void {
-            [$evens, $odds] = partition($data, fn ($value, $key) => $value % 2 === 0);
+            [$evens, $odds] = partition($data, fn ($value, $key): bool => $value % 2 === 0);
 
             expect($evens)->toEqual($expectedEvens)
                 ->and($odds)->toEqual($expectedOdds);
@@ -136,7 +136,7 @@ describe('normalizeResolvers', function (): void {
     });
 
     it('throws ViteException for non-callable non-array values', function (): void {
-        expect(fn () => normalizeResolvers('not-callable-or-array'))->toThrow(ViteException::class);
+        expect(fn (): array => normalizeResolvers('not-callable-or-array'))->toThrow(ViteException::class);
     });
 
     it('throws ViteException when an array contains invalid element types', function (): void {
@@ -145,6 +145,6 @@ describe('normalizeResolvers', function (): void {
             'invalid' => 'string-value',
         ];
 
-        expect(fn () => normalizeResolvers($input))->toThrow(ViteException::class);
+        expect(fn (): array => normalizeResolvers($input))->toThrow(ViteException::class);
     });
 });

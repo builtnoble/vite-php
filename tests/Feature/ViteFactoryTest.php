@@ -8,9 +8,9 @@ covers(ViteFactory::class);
 
 describe('Vite Factory', function (): void {
     it('throws exception if creator is not a valid Vite instance', function (): void {
-        $invalidCreator = fn () => new stdClass();
+        $invalidCreator = fn (): \stdClass => new stdClass();
 
-        expect(fn () => ViteFactory::make(creator: $invalidCreator))->toThrow(
+        expect(fn (): \Builtnoble\VitePHP\ViteInterface => ViteFactory::make(creator: $invalidCreator))->toThrow(
             ViteException::class,
             'The creator callable must return an instance of Builtnoble\VitePHP\Vite'
         );
@@ -23,7 +23,7 @@ describe('Vite Factory', function (): void {
             ->and($viteFactory->getHotfile())->toBe('public/hot')
             ->and($viteFactory->getNonce())->toBeNull()
             ->and($viteFactory->isRunningHot())->toBeFalse()
-            ->and(fn () => $viteFactory->asset('app.js'))->toThrow(
+            ->and(fn (): string => $viteFactory->asset('app.js'))->toThrow(
                 ViteException::class,
                 'Vite manifest not found at path: public/build/.vite/manifest.json'
             );
@@ -71,7 +71,7 @@ describe('Vite Factory', function (): void {
         $viteFactory = ViteFactory::make($options, $this->creator);
 
         expect($viteFactory->getHotfile())->toBe('123')
-            ->and(fn () => $viteFactory->asset('app.js'))->toThrow(
+            ->and(fn (): string => $viteFactory->asset('app.js'))->toThrow(
                 ViteException::class,
                 $message
             );

@@ -127,7 +127,7 @@ it('selects the correct manifest key when multiple entries reference the same CS
 
     // add a style resolver that exposes the chosen manifest key via data-src attribute
     $this->vite->setStyleTagAttributesResolvers(
-        fn (string $src, string $url, ?array $chunk = null, ?array $m = null) => ['data-src' => $src]
+        fn (string $src, string $url, ?array $chunk = null, ?array $m = null): array => ['data-src' => $src]
     );
 
     expect(($this->vite)('shared.js'))->toBe(
@@ -143,7 +143,7 @@ it('selects the correct manifest key when multiple entries reference the same CS
 it('resolves correct manifest key for imported styles when using a style resolver', function (): void {
     // Add a resolver that exposes the manifest key used to create the stylesheet tag.
     $this->vite->setStyleTagAttributesResolvers(
-        fn (string $src, string $url, ?array $chunk = null, ?array $m = null) => ['data-src' => $src]
+        fn (string $src, string $url, ?array $chunk = null, ?array $m = null): array => ['data-src' => $src]
     );
 
     // vendor.js imports shared.js which references assets/shared.def456.css,
