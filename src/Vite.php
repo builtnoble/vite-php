@@ -339,6 +339,7 @@ final class Vite implements ViteInterface
             if ($value === false || $value === null) {
                 continue;
             }
+
             if ($value === true) {
                 $result[] = $key;
             } else {
