@@ -9,4 +9,11 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ])
-    ->withPhpLevel(83);
+    ->withPreparedSets(
+        codeQuality: true,
+        deadCode: true,
+        instanceOf: true,
+        privatization: true,
+        typeDeclarations: true,
+    )
+    ->withPhpSets(php85: true);
