@@ -42,11 +42,13 @@ final class Vite implements ViteInterface
 
     /**
      * Additional attributes to add to the script tags when generating.
+     * @var callable[]
      */
     private array $scriptTagAttributesResolvers = [];
 
     /**
      * Additional attributes to add to the style tags when generating.
+     * @var callable[]
      */
     private array $styleTagAttributesResolvers = [];
 
